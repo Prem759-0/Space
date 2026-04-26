@@ -5,13 +5,14 @@
 
 import { Suspense, useState, useRef, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { CameraControls, PerspectiveCamera, Float, Text } from '@react-three/drei';
+import { CameraControls, PerspectiveCamera, Float, Text, Stars } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import { motion, AnimatePresence } from 'motion/react';
 import * as THREE from 'three';
 
 import { Galaxy } from './components/Galaxy';
 import { Sun } from './components/Sun';
+import { SolarSystem } from './components/SolarSystem';
 import { Overlay } from './components/Overlay';
 import { WarpStreaks } from './components/WarpStreaks';
 import { StarData, FAMOUS_STARS } from './constants/stars';
@@ -28,15 +29,20 @@ function Scene({
   return (
     <>
       <color attach="background" args={['#010103']} />
-      <fog attach="fog" args={['#010103', 10, isWarping ? 500 : 1000]} />
+      <fog attach="fog" args={['#010103', 10, isWarping ? 500 : 2000]} />
       
-      <ambientLight intensity={0.2} />
+      <ambientLight intensity={0.5} />
+      <pointLight position={[0, 0, 0]} intensity={2} color="#ffcc33" />
+      
+      <Sun />
+      <SolarSystem />
+      <Galaxy showConstellations={showConstellations} />
+      <WarpStreaks active={isWarping} />
+      <Stars radius={300} depth={60} count={20000} factor={7} saturation={0} fade speed={1} />
+      
+      <gridHelper args={[1000, 50, '#333333', '#111111']} position={[0, -50, 0]} />
       
       <Suspense fallback={null}>
-        <Sun />
-        <Galaxy showConstellations={showConstellations} />
-        <WarpStreaks active={isWarping} />
-        
         {/* Distance markers for famous stars */}
         {FAMOUS_STARS.map((star, idx) => {
           if (star.id === 'sun') return null;

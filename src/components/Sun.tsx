@@ -19,12 +19,14 @@ const fragmentShader = `
   varying vec3 vNormal;
 
   void main() {
-    float intensity = pow(0.7 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 3.5);
-    vec3 glow = vec3(1.0, 0.5, 0.1) * intensity;
+    float dotProduct = dot(vNormal, vec3(0.0, 0.0, 1.0));
+    float intensity = pow(max(0.7 - dotProduct, 0.0), 3.5);
+    vec3 glow = vec3(1.0, 0.4, 0.1) * intensity * 2.0;
     
-    // Core color oscillation
-    float pulse = sin(uTime * 1.5) * 0.1 + 0.9;
-    vec3 core = vec3(1.0, 0.7, 0.2) * pulse;
+    // Core color oscillation with noise-like patterns
+    float noise = sin(vUv.x * 20.0 + uTime) * sin(vUv.y * 20.0 - uTime) * 0.05;
+    float pulse = sin(uTime * 1.5) * 0.1 + 0.9 + noise;
+    vec3 core = vec3(1.0, 0.8, 0.3) * pulse;
     
     gl_FragColor = vec4(core + glow, 1.0);
   }
